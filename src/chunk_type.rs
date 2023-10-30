@@ -2,7 +2,7 @@ use std::convert::TryFrom;
 use std::fmt::Display;
 use std::str::FromStr;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct ChunkType {
     bytes: [u8; 4],
 }
