@@ -91,4 +91,19 @@ impl Cli {
         }
         Ok(())
     }
+
+    fn remove(png_file: path::PathBuf, chunk_type: &str) -> crate::Result<()> {
+        let mut options = fs::OpenOptions::new();
+        let mut png_file = options.read(true).write(true).open(png_file)?;
+        let mut png_bytes: Vec<u8> = Vec::new();
+        png_file.read_to_end(&mut png_bytes)?;
+        let mut png = crate::png::Png::try_from(png_bytes.as_slice())?;
+
+        if let Some(chunk) = png.remove_chunk(chunk_type) {
+            println!("Chunk removed successfully");
+        } else {
+            eprintln!("Chunk not found");
+        }
+        Ok(())
+    }
 }
