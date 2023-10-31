@@ -1,7 +1,7 @@
 use crate::chunk_type::ChunkType;
 use std::convert::TryFrom;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Chunk {
     length: u32,
     type_: ChunkType,
@@ -11,7 +11,11 @@ pub struct Chunk {
 
 impl std::fmt::Display for Chunk {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        writeln!(
+            f,
+            "Chunk: Data_len={}, type={}, crc={}",
+            self.length, self.type_, self.crc
+        )
     }
 }
 
@@ -23,7 +27,9 @@ impl TryFrom<&[u8]> for Chunk {
             || value.len()
                 < Chunk::CHUNK_TYPE_BYTES_LEN + Chunk::CRC_BYTES_LEN + Chunk::DATA_LEN_BYTES_LEN
         {
-            return Err("Type and CRC bytes missing".into());
+            return Err(
+                format!("Type and CRC bytes missing. Bytes length = {}", value.len()).into(),
+            );
         }
 
         let (data_len_bytes, value) = value.split_at(Chunk::DATA_LEN_BYTES_LEN);
@@ -106,8 +112,7 @@ impl Chunk {
     }
 
     pub fn as_bytes(&self) -> Vec<u8> {
-        self.data
-            .len()
+        (self.data.len() as u32)
             .to_be_bytes()
             .iter()
             .chain(self.type_.bytes().iter())
