@@ -73,7 +73,22 @@ impl Cli {
         Ok(png_file.write_all(&png.as_bytes())?)
     }
 
-    fn decode(png_file: path::PathBuf, chunk_type: ChunkType) -> crate::Result<()> {
-        todo!()
+    fn decode(png_file: path::PathBuf, chunk_type: &str) -> crate::Result<()> {
+        let mut file = fs::File::open(png_file)?;
+        let mut png_bytes = Vec::new();
+        file.read_to_end(&mut png_bytes)?;
+        let png = crate::png::Png::try_from(png_bytes.as_slice())?;
+        let chunk = png.chunk_by_type(chunk_type);
+        match chunk {
+            None => println!("Message not found"),
+            Some(chunk) => {
+                if let Ok(msg) = chunk.data_as_string() {
+                    println!("Message: {msg}");
+                } else {
+                    println!("Message: {:?}", chunk.data());
+                }
+            }
+        }
+        Ok(())
     }
 }
