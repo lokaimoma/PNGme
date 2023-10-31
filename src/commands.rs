@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use std::fs;
-use std::io::{Read, Write};
+use std::io::{Read, Seek, SeekFrom, Write};
 use std::path;
 
 use crate::chunk_type::ChunkType;
@@ -69,6 +69,11 @@ impl Cli {
         let chunk =
             crate::chunk::Chunk::new(chunk_type, message.as_bytes().iter().copied().collect());
         png.append_chunk(chunk);
+        png_file.rewind()?;
         Ok(png_file.write_all(&png.as_bytes())?)
+    }
+
+    fn decode(png_file: path::PathBuf, chunk_type: ChunkType) -> crate::Result<()> {
+        todo!()
     }
 }
