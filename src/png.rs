@@ -66,7 +66,8 @@ impl Png {
     }
 
     pub fn append_chunk(&mut self, chunk: Chunk) {
-        self.chunks.push(chunk)
+        // Making sure IEND is always the last chunk
+        self.chunks.insert(self.chunks.len() - 1, chunk)
     }
 
     pub fn remove_chunk(&mut self, chunk_type: &str) -> crate::Result<Chunk> {

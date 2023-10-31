@@ -4,13 +4,13 @@ use std::fs;
 use std::io::{Read, Seek, Write};
 use std::path;
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 pub struct Cli {
     #[command(subcommand)]
     command: Command,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Debug)]
 enum Command {
     Encode {
         #[arg(short, long)]

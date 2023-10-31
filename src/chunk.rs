@@ -37,7 +37,7 @@ impl TryFrom<&[u8]> for Chunk {
         let chunk_type_bytes: [u8; 4] = chunk_type_bytes.try_into()?;
         let type_: ChunkType = chunk_type_bytes.try_into()?;
         if !type_.is_valid() {
-            return Err("Chunk type not valid".into());
+            return Err(format!("Chunk type not valid. Chunk_Type: {type_}").into());
         }
         let length = u32::from_be_bytes(data_len_bytes.try_into()?) as usize;
         let (data_bytes, crc_bytes) = value.split_at(length);
