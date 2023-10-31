@@ -99,11 +99,20 @@ impl Cli {
         png_file.read_to_end(&mut png_bytes)?;
         let mut png = crate::png::Png::try_from(png_bytes.as_slice())?;
 
-        if let Ok(chunk) = png.remove_chunk(chunk_type) {
+        if let Ok(_) = png.remove_chunk(chunk_type) {
             println!("Chunk removed successfully");
         } else {
             eprintln!("Chunk not found");
         }
+        Ok(())
+    }
+
+    fn print(png_file: path::PathBuf) -> crate::Result<()> {
+        let mut file = fs::File::open(png_file)?;
+        let mut png_bytes = Vec::new();
+        file.read_to_end(&mut png_bytes)?;
+        let png = crate::png::Png::try_from(png_bytes.as_slice())?;
+        println!("{png}");
         Ok(())
     }
 }
