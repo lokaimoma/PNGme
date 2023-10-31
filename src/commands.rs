@@ -34,6 +34,10 @@ enum Command {
         #[arg(short, long)]
         chunk_type: String,
     },
+    Print {
+        #[arg(short, long)]
+        file_path: path::PathBuf,
+    },
 }
 
 impl Cli {
@@ -50,13 +54,14 @@ impl Cli {
             Command::Decode {
                 file_path,
                 chunk_type,
-            } => todo!(),
+            } => Cli::decode(file_path, &chunk_type)?,
             Command::Remove {
                 file_path,
                 chunk_type,
-            } => todo!(),
+            } => Cli::remove(file_path, &chunk_type)?,
+            Command::Print { file_path } => Cli::print(file_path)?,
         }
-        todo!()
+        Ok(())
     }
 
     fn encode(
