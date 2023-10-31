@@ -1,9 +1,8 @@
+use crate::chunk_type::ChunkType;
 use clap::{Parser, Subcommand};
 use std::fs;
-use std::io::{Read, Seek, SeekFrom, Write};
+use std::io::{Read, Seek, Write};
 use std::path;
-
-use crate::chunk_type::ChunkType;
 
 #[derive(Parser)]
 pub struct Cli {
@@ -47,7 +46,7 @@ impl Cli {
                 chunk_type,
                 message,
                 output_file,
-            } => todo!(),
+            } => Cli::encode(file_path, chunk_type.try_into()?, &message, output_file)?,
             Command::Decode {
                 file_path,
                 chunk_type,
@@ -60,7 +59,12 @@ impl Cli {
         todo!()
     }
 
-    fn encode(png_file: path::PathBuf, chunk_type: ChunkType, message: &str) -> crate::Result<()> {
+    fn encode(
+        png_file: path::PathBuf,
+        chunk_type: ChunkType,
+        message: &str,
+        output_file: Option<path::PathBuf>,
+    ) -> crate::Result<()> {
         let mut options = fs::OpenOptions::new();
         let mut png_file = options.read(true).write(true).open(png_file)?;
         let mut png_bytes: Vec<u8> = Vec::new();
@@ -69,8 +73,15 @@ impl Cli {
         let chunk =
             crate::chunk::Chunk::new(chunk_type, message.as_bytes().iter().copied().collect());
         png.append_chunk(chunk);
-        png_file.rewind()?;
-        Ok(png_file.write_all(&png.as_bytes())?)
+
+        return if let None = output_file {
+            png_file.rewind()?;
+            Ok(png_file.write_all(&png.as_bytes())?)
+        } else {
+            let mut option = fs::OpenOptions::new();
+            let mut output_file = option.write(true).create(true).open(output_file.unwrap())?;
+            Ok(output_file.write_all(&png.as_bytes())?)
+        };
     }
 
     fn decode(png_file: path::PathBuf, chunk_type: &str) -> crate::Result<()> {
